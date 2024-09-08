@@ -9,11 +9,6 @@ void main() {
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
-  //variables globales
-  final nombreUsuarioSesion = "Nombre Usuario";
-  final idUsuarioSesion = 1;
-  final tipoUsuarioSesion = 1;
-
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
