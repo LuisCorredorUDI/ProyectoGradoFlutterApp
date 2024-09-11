@@ -24,6 +24,10 @@ class HomePage extends StatefulWidget {
 
 //Homestate estado inicio
 class _HomeState extends State<HomePage> {
+  //Variables
+  String rutaFotoPerfil = '';
+  String tipoPerfil = '';
+
   @override
   void initState() {
     super.initState();
@@ -31,6 +35,20 @@ class _HomeState extends State<HomePage> {
     print('ID Usuario: ${widget.idUsuarioSesion}');
     print('Nombre Usuario: ${widget.nombreUsuarioSesion}');
     print('Tipo Usuario: ${widget.tipoUsuarioSesion}');
+
+    if (widget.tipoUsuarioSesion == '1') {
+      rutaFotoPerfil = 'lib/recursos/coor.png';
+      tipoPerfil = 'Coordinador';
+    } else if (widget.tipoUsuarioSesion == '2') {
+      rutaFotoPerfil = 'lib/recursos/acu.png';
+      tipoPerfil = 'Acudiente';
+    } else if (widget.tipoUsuarioSesion == '3') {
+      rutaFotoPerfil = 'lib/recursos/est.png';
+      tipoPerfil = 'Estudiante';
+    } else {
+      rutaFotoPerfil = 'lib/recursos/acu.png';
+      tipoPerfil = 'Usuario';
+    }
   }
 
   @override
@@ -58,10 +76,16 @@ class _HomeState extends State<HomePage> {
               width: 100,
               height: 100,
               margin: const EdgeInsets.only(top: 50),
-              child: Image.network(
-                  "https://e7.pngegg.com/pngimages/178/595/png-clipart-user-profile-computer-icons-login-user-avatars-monochrome-black-thumbnail.png"),
+              child: Image.asset(rutaFotoPerfil),
             ),
-            // Aquí se muestra el nombre del usuario en lugar de 'hola'
+            Text(
+              tipoPerfil,
+              style: const TextStyle(
+                fontStyle: FontStyle.italic,
+                fontSize: 20,
+                color: Colors.red,
+              ),
+            ),
             Text(
               widget.nombreUsuarioSesion,
               style: const TextStyle(

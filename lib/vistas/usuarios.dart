@@ -18,7 +18,7 @@ class ClaseUsuario extends StatefulWidget {
 }
 
 class _UsuarioState extends State<ClaseUsuario> {
-  // Lista para recibir los mensajes
+  // Lista para recibir los usuarios
   List<ConversorUsuario> listaUsuarios = [];
 
   //proceso init state

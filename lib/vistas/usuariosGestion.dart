@@ -2,7 +2,6 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:proyecto_grado_app/vistas/usuarios.dart';
 
 class ClaseUsuarioGestion extends StatefulWidget {
   //Variables globales
