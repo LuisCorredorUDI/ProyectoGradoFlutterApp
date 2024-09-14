@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_grado_app/vistas/Conversores/conversorPqr.dart';
 import 'package:proyecto_grado_app/vistas/pqrGestion.dart';
+import 'package:proyecto_grado_app/vistas/pqrGestionDetalle.dart';
 
 class ClasePQR extends StatefulWidget {
   final String idUsuarioSesion;
@@ -27,7 +28,7 @@ class _ClasePQRState extends State<ClasePQR> {
   // Lista simulada de PQRs
   List<String> pqrList = [];
 
-  //Para esperar el resultado de la vista de creacion o edicion
+  //Para esperar el resultado de la vista de creacion
   Future<void> NavigateAndRefresh(
       BuildContext context, String codigoPqr, int modo) async {
     await Navigator.push(
@@ -38,7 +39,23 @@ class _ClasePQRState extends State<ClasePQR> {
       ),
     );
     // Volver a cargar los usuarios después de regresar
-    //cargarPqr();
+    filtroSeleccionado = 'Todas';
+    cargarPqr(widget.idUsuarioSesion, widget.tipoUsuarioSesion, 'Todas');
+  }
+
+  //Para definir quien necesita ver el detalle, si el coordinador para dar respuesta
+  //o el usuario para consultar
+  Future<void> CargarDetallePqr(int codigo, int numeroReferencia) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ClasepqrGestionDetalle(
+            widget.tipoUsuarioSesion, codigo, numeroReferencia),
+      ),
+    );
+    // Volver a cargar los usuarios después de regresar
+    filtroSeleccionado = 'Todas';
+    cargarPqr(widget.idUsuarioSesion, widget.tipoUsuarioSesion, 'Todas');
   }
 
   // Método para cargar la lista de PQRs
@@ -215,33 +232,36 @@ class _ClasePQRState extends State<ClasePQR> {
     String formattedFechaCreacion =
         "${pqr.fechacreacion.year}/${pqr.fechacreacion.month.toString().padLeft(2, '0')}/${pqr.fechacreacion.day.toString().padLeft(2, '0')}";
 
-    return Card(
-      margin: const EdgeInsets.all(10),
-      color: Colors.grey[300],
-      child: Padding(
-        padding: const EdgeInsets.all(5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoRow('Número de Referencia:', '${pqr.numeroreferencia}'),
-            const SizedBox(height: 3),
-            // FECHACREACION y NOMBRETIPOPQR en la misma fila
-            _buildInfoRowWithColumns(
-              'Fecha de Creación:',
-              formattedFechaCreacion,
-              'Tipo de PQR:',
-              pqr.nombretipopqr,
-            ),
-            const SizedBox(height: 3),
-            // NOMBRE_GRAVEDADTIPOPQR y ESTADOPQR en la misma fila
-            _buildInfoRowWithColumns(
-              'Gravedad:',
-              pqr.nombreGravedadtipopqr,
-              'Estado:',
-              estadoTexto,
-              gravedadColor: gravedadColor,
-            ),
-          ],
+    return InkWell(
+      onTap: () {
+        CargarDetallePqr(pqr.codigo, pqr.numeroreferencia);
+      },
+      child: Card(
+        margin: const EdgeInsets.all(10),
+        color: Colors.grey[300],
+        child: Padding(
+          padding: const EdgeInsets.all(5),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildInfoRow('Número de Referencia:', '${pqr.numeroreferencia}'),
+              const SizedBox(height: 3),
+              _buildInfoRowWithColumns(
+                'Fecha de Creación:',
+                formattedFechaCreacion,
+                'Tipo de PQR:',
+                pqr.nombretipopqr,
+              ),
+              const SizedBox(height: 3),
+              _buildInfoRowWithColumns(
+                'Gravedad:',
+                pqr.nombreGravedadtipopqr,
+                'Estado:',
+                estadoTexto,
+                gravedadColor: gravedadColor,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -327,6 +347,8 @@ class _ClasePQRState extends State<ClasePQR> {
         return 'Sin Revisar';
       case 1:
         return 'Revisada';
+      case 2:
+        return 'Cancelada';
       default:
         return 'Desconocido';
     }

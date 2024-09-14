@@ -100,6 +100,7 @@ class _PqrGestionState extends State<ClasePqrGestion> {
     }
   }
 
+  //Vista principal inicio
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -295,4 +296,5 @@ class _PqrGestionState extends State<ClasePqrGestion> {
       ),
     );
   }
+  //Vista principal fin
 }
