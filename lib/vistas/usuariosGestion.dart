@@ -2,11 +2,13 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:proyecto_grado_app/vistas/acudiente.dart';
 
 class ClaseUsuarioGestion extends StatefulWidget {
   //Variables globales
   final String idUsuarioSesion;
   final String nombreUsuarioSesion;
+  // 1 - coor, 2 - acu, 3 - est
   final String tipoUsuarioSesion;
   final String idUsuarioConsulta;
   //Modo 0 = creacion, modo 1 = edicion
@@ -52,12 +54,12 @@ class _UsuarioGestionState extends State<ClaseUsuarioGestion> {
     super.initState();
     //aqui validamos si es, una creacion, edicion o consulta.
     if (widget.idUsuarioConsulta != '0') {
-      CargarDatosIniciales(widget.idUsuarioConsulta);
+      cargarDatosIniciales(widget.idUsuarioConsulta);
     }
   }
 
   //FUNCION DE CARGUE DE DATOS, EN CASO DE CONSULTA O EDICION.
-  Future<void> CargarDatosIniciales(String idUsuarioConsulta) async {
+  Future<void> cargarDatosIniciales(String idUsuarioConsulta) async {
     final respuesta = await Dio().get(
         'http://10.0.2.2:3000/usuario/DetalleUsuario/' + idUsuarioConsulta);
     //Variables para fechas
@@ -203,7 +205,8 @@ class _UsuarioGestionState extends State<ClaseUsuarioGestion> {
   }
 
   //funcion para eliminacion de usuarios
-  Future<bool> EliminarUsuario() async {
+
+  Future<bool> eliminarUsuario() async {
     final respuesta = await Dio().delete(
         'http://10.0.2.2:3000/usuario/EliminarUsuario/' +
             widget.idUsuarioConsulta);
@@ -215,6 +218,17 @@ class _UsuarioGestionState extends State<ClaseUsuarioGestion> {
       print('Error al eliminar usuario: ${respuesta.data.toString()}');
       return false;
     }
+  }
+
+  // Para esperar el resultado de la vista de creación o edición
+  Future<void> vincularEstudiante(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            ClaseAcudiente(widget.idUsuarioConsulta, widget.tipoUsuarioSesion),
+      ),
+    );
   }
 
   // Método para seleccionar fecha
@@ -278,139 +292,193 @@ class _UsuarioGestionState extends State<ClaseUsuarioGestion> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      // Acciones de guardado
-                      if (nombresController.text != '' &&
-                          apellidosController.text != '' &&
-                          documentoController.text != '' &&
-                          claveIngresoController.text != '' &&
-                          fechaNacimientoController.text != '' &&
-                          numeroMovilController.text != '' &&
-                          estadoSeleccionado != '' &&
-                          tipoUsuarioSeleccionado != null) {
-                        // Verificar si es null
-                        if (await GuardarUsuarioAPI()) {
-                          //Aviso al usuario
-                          final snackBar = SnackBar(
-                            elevation: 0,
-                            behavior: SnackBarBehavior.floating,
-                            backgroundColor: Colors.transparent,
-                            content: AwesomeSnackbarContent(
-                              title: 'Información',
-                              message:
-                                  'Se ha guardado el usuario de forma correcta.',
-                              contentType: ContentType.success,
-                            ),
-                          );
+                  Expanded(
+                    child: SizedBox(
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          // Acciones de guardado
+                          if (nombresController.text != '' &&
+                              apellidosController.text != '' &&
+                              documentoController.text != '' &&
+                              claveIngresoController.text != '' &&
+                              fechaNacimientoController.text != '' &&
+                              numeroMovilController.text != '' &&
+                              estadoSeleccionado != '' &&
+                              tipoUsuarioSeleccionado != null) {
+                            if (await GuardarUsuarioAPI()) {
+                              final snackBar = SnackBar(
+                                elevation: 0,
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.transparent,
+                                content: AwesomeSnackbarContent(
+                                  title: 'Información',
+                                  message:
+                                      'Se ha guardado el usuario de forma correcta.',
+                                  contentType: ContentType.success,
+                                ),
+                              );
 
-                          ScaffoldMessenger.of(context)
-                            ..hideCurrentSnackBar()
-                            ..showSnackBar(snackBar);
-                          Navigator.pop(context);
-                          /*Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ClaseUsuario(
-                                  widget.idUsuarioSesion,
-                                  widget.nombreUsuarioSesion,
-                                  widget.tipoUsuarioSesion),
-                            ),
-                          );
-                          */
-                        } else {
-                          //Aviso al usuario
-                          final snackBar = SnackBar(
-                            elevation: 0,
-                            behavior: SnackBarBehavior.floating,
-                            backgroundColor: Colors.transparent,
-                            content: AwesomeSnackbarContent(
-                              title: 'Información',
-                              message:
-                                  'Ocurrio un error al guardar el usuario.',
-                              contentType: ContentType.failure,
-                            ),
-                          );
+                              ScaffoldMessenger.of(context)
+                                ..hideCurrentSnackBar()
+                                ..showSnackBar(snackBar);
+                              Navigator.pop(context);
+                            } else {
+                              final snackBar = SnackBar(
+                                elevation: 0,
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.transparent,
+                                content: AwesomeSnackbarContent(
+                                  title: 'Información',
+                                  message:
+                                      'Ocurrió un error al guardar el usuario.',
+                                  contentType: ContentType.failure,
+                                ),
+                              );
 
-                          ScaffoldMessenger.of(context)
-                            ..hideCurrentSnackBar()
-                            ..showSnackBar(snackBar);
-                        }
-                      } else {
-                        //Aviso al usuario
-                        final snackBar = SnackBar(
-                          elevation: 0,
-                          behavior: SnackBarBehavior.floating,
-                          backgroundColor: Colors.transparent,
-                          content: AwesomeSnackbarContent(
-                            title: 'Información',
-                            message:
-                                'Los campos marcados con * son obligatorios.',
-                            contentType: ContentType.warning,
-                          ),
-                        );
+                              ScaffoldMessenger.of(context)
+                                ..hideCurrentSnackBar()
+                                ..showSnackBar(snackBar);
+                            }
+                          } else {
+                            final snackBar = SnackBar(
+                              elevation: 0,
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: Colors.transparent,
+                              content: AwesomeSnackbarContent(
+                                title: 'Información',
+                                message:
+                                    'Los campos marcados con * son obligatorios.',
+                                contentType: ContentType.warning,
+                              ),
+                            );
 
-                        ScaffoldMessenger.of(context)
-                          ..hideCurrentSnackBar()
-                          ..showSnackBar(snackBar);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Colors.greenAccent[200], // Color primario
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(snackBar);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.greenAccent[200],
+                        ),
+                        child: const Text(
+                          'Guardar Usuario',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
                     ),
-                    child: const Text('Guardar Usuario'),
                   ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      // Acciones de eliminación
-                      if (await EliminarUsuario()) {
-                        //Aviso al usuario
-                        final snackBar = SnackBar(
-                          elevation: 0,
-                          behavior: SnackBarBehavior.floating,
-                          backgroundColor: Colors.transparent,
-                          content: AwesomeSnackbarContent(
-                            title: 'Información',
-                            message:
-                                'Se ha eliminado el usuario de forma correcta.',
-                            contentType: ContentType.warning,
-                          ),
-                        );
+                  const SizedBox(width: 10), // Espacio entre los botones
+                  Expanded(
+                    child: SizedBox(
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          // Acciones de eliminación
+                          if (await eliminarUsuario()) {
+                            final snackBar = SnackBar(
+                              elevation: 0,
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: Colors.transparent,
+                              content: AwesomeSnackbarContent(
+                                title: 'Información',
+                                message:
+                                    'Se ha eliminado el usuario de forma correcta.',
+                                contentType: ContentType.warning,
+                              ),
+                            );
 
-                        ScaffoldMessenger.of(context)
-                          ..hideCurrentSnackBar()
-                          ..showSnackBar(snackBar);
-                        //Cambio de vista
-                        Navigator.pop(context);
-                      } else {
-                        //Aviso al usuario
-                        final snackBar = SnackBar(
-                          elevation: 0,
-                          behavior: SnackBarBehavior.floating,
-                          backgroundColor: Colors.transparent,
-                          content: AwesomeSnackbarContent(
-                            title: 'Información',
-                            message:
-                                'Se ha producido un error al eliminar el usuario.',
-                            contentType: ContentType.failure,
-                          ),
-                        );
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(snackBar);
+                            Navigator.pop(context);
+                          } else {
+                            final snackBar = SnackBar(
+                              elevation: 0,
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: Colors.transparent,
+                              content: AwesomeSnackbarContent(
+                                title: 'Información',
+                                message: 'Error al eliminar el usuario.',
+                                contentType: ContentType.failure,
+                              ),
+                            );
 
-                        ScaffoldMessenger.of(context)
-                          ..hideCurrentSnackBar()
-                          ..showSnackBar(snackBar);
-                        //Cambio de vista
-                        Navigator.pop(context);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red[200], // Color primario
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(snackBar);
+                            Navigator.pop(context);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red[200],
+                        ),
+                        child: const Text(
+                          'Eliminar Usuario',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
                     ),
-                    child: const Text('Eliminar Usuario'),
                   ),
+                  const SizedBox(width: 10),
+                  // Botón "Vincular" que solo se muestra si modo es igual a 1
+                  if (widget.modo == 1) ...[
+                    Expanded(
+                      child: SizedBox(
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (tipoUsuarioSeleccionado != null) {
+                              if (tipoUsuarioSeleccionado == 'Acudiente') {
+                                vincularEstudiante(context);
+                              } else {
+                                final snackBar = SnackBar(
+                                  elevation: 0,
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: Colors.transparent,
+                                  content: AwesomeSnackbarContent(
+                                    title: 'Información',
+                                    message:
+                                        'La acción solo es permitida para usuarios de tipo: Acudiente',
+                                    contentType: ContentType.warning,
+                                  ),
+                                );
+
+                                ScaffoldMessenger.of(context)
+                                  ..hideCurrentSnackBar()
+                                  ..showSnackBar(snackBar);
+                              }
+                            } else {
+                              final snackBar = SnackBar(
+                                elevation: 0,
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.transparent,
+                                content: AwesomeSnackbarContent(
+                                  title: 'Información',
+                                  message:
+                                      'Seleccione un tipo de usuario primero.',
+                                  contentType: ContentType.warning,
+                                ),
+                              );
+
+                              ScaffoldMessenger.of(context)
+                                ..hideCurrentSnackBar()
+                                ..showSnackBar(snackBar);
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue[200],
+                          ),
+                          child: const Text(
+                            'Vincular',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
-              ),
+              )
             ],
           ),
         ),

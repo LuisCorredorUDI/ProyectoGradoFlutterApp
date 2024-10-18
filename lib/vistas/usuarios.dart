@@ -4,7 +4,6 @@ import 'package:proyecto_grado_app/vistas/Conversores/conversorUsuario.dart';
 import 'package:proyecto_grado_app/vistas/usuariosGestion.dart';
 
 class ClaseUsuario extends StatefulWidget {
-  //Variables globales
   final String idUsuarioSesion;
   final String nombreUsuarioSesion;
   final String tipoUsuarioSesion;
@@ -18,17 +17,41 @@ class ClaseUsuario extends StatefulWidget {
 }
 
 class _UsuarioState extends State<ClaseUsuario> {
-  // Lista para recibir los usuarios
+  // Lista completa de usuarios
   List<ConversorUsuario> listaUsuarios = [];
+  // Lista filtrada de usuarios
+  List<ConversorUsuario> listaFiltrada = [];
 
-  //proceso init state
+  // Controlador para el campo de búsqueda
+  TextEditingController _searchController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     traerUsuarios();
+
+    // Escuchar cambios en el texto de búsqueda
+    _searchController.addListener(_filtrarUsuarios);
   }
 
-  //Para esperar el resultado de la vista de creacion o edicion
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  // Función para filtrar usuarios según el texto de búsqueda
+  void _filtrarUsuarios() {
+    String textoBusqueda = _searchController.text.toLowerCase();
+
+    setState(() {
+      listaFiltrada = listaUsuarios.where((usuario) {
+        return usuario.nombres.toLowerCase().contains(textoBusqueda);
+      }).toList();
+    });
+  }
+
+  // Para esperar el resultado de la vista de creación o edición
   Future<void> NavigateAndRefresh(
       BuildContext context, String idUsuario, int valor) async {
     await Navigator.push(
@@ -47,7 +70,7 @@ class _UsuarioState extends State<ClaseUsuario> {
     traerUsuarios();
   }
 
-  //funcion para la consulta de usuarios
+  // Función para la consulta de usuarios
   Future<void> traerUsuarios() async {
     final respuesta = await Dio().get('http://10.0.2.2:3000/usuario');
 
@@ -60,34 +83,49 @@ class _UsuarioState extends State<ClaseUsuario> {
         listaUsuarios = dataList
             .map((elemento) => ConversorUsuario.fromJson(elemento))
             .toList();
+        listaFiltrada = listaUsuarios; // Inicialmente, todos los usuarios
       });
     }
   }
 
-  //vista principal inicio
+  // Vista principal inicio
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("Listado de usuarios"),
-        ),
-        body: Column(
-          children: [
-            _BotonConstructor(),
-            Expanded(
-                child:
-                    _listaUsuarios()), // Aquí envolvemos el ListView en un Expanded
-          ],
-        ));
+      appBar: AppBar(
+        title: const Text("Listado de usuarios"),
+      ),
+      body: Column(
+        children: [
+          _BotonConstructor(),
+          _CajaBusqueda(), // Caja de texto para buscar usuarios
+          Expanded(child: _listaUsuarios()), // Lista de usuarios filtrados
+        ],
+      ),
+    );
   }
-  //vista principal fin
 
-  //listado inicio
+  // Caja de texto para buscar usuarios
+  Widget _CajaBusqueda() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+        controller: _searchController,
+        decoration: const InputDecoration(
+          labelText: 'Buscar usuario por nombre',
+          border: OutlineInputBorder(),
+          prefixIcon: Icon(Icons.search),
+        ),
+      ),
+    );
+  }
+
+  // Listado de usuarios
   Widget _listaUsuarios() {
     return ListView.builder(
-      itemCount: listaUsuarios.length,
+      itemCount: listaFiltrada.length,
       itemBuilder: (context, index) {
-        final item_usuario = listaUsuarios[index];
+        final item_usuario = listaFiltrada[index];
         return Card(
           elevation: 2,
           margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
@@ -104,7 +142,6 @@ class _UsuarioState extends State<ClaseUsuario> {
                 style: const TextStyle(color: Colors.black), // Texto negro
               ),
             ),
-            // Evento onTap para navegar a ClaseUsuarioGestion
             onTap: () {
               NavigateAndRefresh(context, item_usuario.id.toString(), 1);
             },
@@ -114,10 +151,7 @@ class _UsuarioState extends State<ClaseUsuario> {
     );
   }
 
-  //listado fin
-
-  //boton inicio
-  // ignore: non_constant_identifier_names
+  // Botón para crear usuarios
   Widget _BotonConstructor() {
     return Container(
       margin: const EdgeInsets.all(5), // Margen de 5 píxeles
@@ -135,5 +169,4 @@ class _UsuarioState extends State<ClaseUsuario> {
       ),
     );
   }
-  //boton fin
 }

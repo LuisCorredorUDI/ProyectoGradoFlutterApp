@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert'; // Para convertir Base64
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:proyecto_grado_app/vistas/acudiente.dart';
 import 'package:proyecto_grado_app/vistas/evento.dart';
 import 'package:proyecto_grado_app/vistas/Conversores/conversorEventoHome.dart';
 import 'package:proyecto_grado_app/vistas/citaciones.dart';
@@ -13,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class HomePage extends StatefulWidget {
   final String idUsuarioSesion;
   final String nombreUsuarioSesion;
+  // 1 - coor, 2 - acu, 3 - est
   final String tipoUsuarioSesion;
 
   const HomePage(
@@ -285,6 +287,20 @@ class _HomeState extends State<HomePage> {
                     MaterialPageRoute(
                       builder: (context) => ClaseEvento(widget.idUsuarioSesion,
                           widget.nombreUsuarioSesion, widget.tipoUsuarioSesion),
+                    ),
+                  );
+                },
+              ),
+            // Condicional para mostrar la opción de "Mis Estudiantes" solo para Acudiente (tipoUsuarioSesion == '2')
+            if (widget.tipoUsuarioSesion == '2')
+              _menuItem(
+                title: 'Mis Estudiantes',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ClaseAcudiente(
+                          widget.idUsuarioSesion, widget.tipoUsuarioSesion),
                     ),
                   );
                 },
