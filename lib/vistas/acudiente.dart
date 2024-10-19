@@ -2,6 +2,7 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_grado_app/vistas/Conversores/conversorUsuario.dart';
+import 'package:proyecto_grado_app/vistas/citacionGestion.dart';
 
 class ClaseAcudiente extends StatefulWidget {
   //Acudiente al que vamos a gestionar
@@ -131,6 +132,17 @@ class _AcudienteState extends State<ClaseAcudiente> {
     }
   }
 
+  // Para esperar el resultado de la vista de creación de citaciones
+  Future<void> citarAcudiente(BuildContext context, int idEstudiante) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ClaseCitacionGestion(widget.idUsuarioConsulta,
+            idEstudiante.toString(), widget.tipoUsuarioSesion),
+      ),
+    );
+  }
+
   // Vista principal inicio
   @override
   Widget build(BuildContext context) {
@@ -258,47 +270,73 @@ class _AcudienteState extends State<ClaseAcudiente> {
               style: const TextStyle(color: Colors.blue), // Título en azul
             ),
             subtitle: Text(item_usuario.documento.toString()),
-            trailing: IconButton(
-              icon: const Icon(Icons.remove), // Icono -
-              color: Colors.blue,
-              onPressed: () async {
-                if (await desvincularEstudiante(item_usuario.id)) {
-                  final snackBar = SnackBar(
-                    elevation: 0,
-                    behavior: SnackBarBehavior.floating,
-                    backgroundColor: Colors.transparent,
-                    content: AwesomeSnackbarContent(
-                      title: 'Información',
-                      message: 'Estudiante Desvinculado de forma correcta',
-                      contentType: ContentType.success,
-                    ),
-                  );
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min, // Para ajustar el tamaño del Row
+              children: [
+                // Botón de la campana de notificaciones
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300], // Color de fondo
+                    shape: BoxShape.circle, // Botón circular
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.notifications), // Icono de campana
+                    color: Colors.blue, // Color del icono
+                    onPressed: () async {
+                      citarAcudiente(context, item_usuario.id);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10), // Espacio entre los botones
+                // Botón de eliminar
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300], // Color de fondo
+                    shape: BoxShape.circle, // Botón circular
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.remove), // Icono de eliminar
+                    color: Colors.blue,
+                    onPressed: () async {
+                      if (await desvincularEstudiante(item_usuario.id)) {
+                        final snackBar = SnackBar(
+                          elevation: 0,
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.transparent,
+                          content: AwesomeSnackbarContent(
+                            title: 'Información',
+                            message:
+                                'Estudiante Desvinculado de forma correcta',
+                            contentType: ContentType.success,
+                          ),
+                        );
 
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(snackBar);
-                  Navigator.pop(context);
-                } else {
-                  final snackBar = SnackBar(
-                    elevation: 0,
-                    behavior: SnackBarBehavior.floating,
-                    backgroundColor: Colors.transparent,
-                    content: AwesomeSnackbarContent(
-                      title: 'Información',
-                      message: 'No se pudo desvincular el estudiante.',
-                      contentType: ContentType.failure,
-                    ),
-                  );
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(snackBar);
+                        Navigator.pop(context);
+                      } else {
+                        final snackBar = SnackBar(
+                          elevation: 0,
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.transparent,
+                          content: AwesomeSnackbarContent(
+                            title: 'Información',
+                            message: 'No se pudo desvincular el estudiante.',
+                            contentType: ContentType.failure,
+                          ),
+                        );
 
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(snackBar);
-                  Navigator.pop(context);
-                }
-              },
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(snackBar);
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
-            onTap:
-                () {}, // Puedes agregar la lógica para el evento onTap si es necesario
           ),
         );
       },

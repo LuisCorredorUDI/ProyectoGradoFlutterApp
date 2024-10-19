@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_grado_app/vistas/acudiente.dart';
 import 'package:proyecto_grado_app/vistas/evento.dart';
 import 'package:proyecto_grado_app/vistas/Conversores/conversorEventoHome.dart';
-import 'package:proyecto_grado_app/vistas/citaciones.dart';
+import 'package:proyecto_grado_app/vistas/citacion.dart';
 import 'package:proyecto_grado_app/vistas/login.dart';
 import 'package:proyecto_grado_app/vistas/pqr.dart';
 import 'package:proyecto_grado_app/vistas/usuarios.dart';
@@ -242,10 +242,8 @@ class _HomeState extends State<HomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ClaseCitaciones(
-                        widget.idUsuarioSesion,
-                        widget.nombreUsuarioSesion,
-                        widget.tipoUsuarioSesion),
+                    builder: (context) => ClaseCitacion(widget.idUsuarioSesion,
+                        widget.nombreUsuarioSesion, widget.tipoUsuarioSesion),
                   ),
                 );
               },

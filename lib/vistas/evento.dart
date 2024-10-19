@@ -8,6 +8,7 @@ class ClaseEvento extends StatefulWidget {
   //Variables
   final String idUsuarioSesion;
   final String nombreUsuarioSesion;
+  // 1 - coor, 2 - acu, 3 - est
   final String tipoUsuarioSesion;
 
   const ClaseEvento(

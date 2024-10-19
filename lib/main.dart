@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:proyecto_grado_app/vistas/login.dart';
 
 void main() {
@@ -16,9 +17,15 @@ class MainApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue, // Cambia aquí el color principal
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        // Puedes agregar más configuraciones de tema aquí
       ),
-      //home: HomePage(),
+      supportedLocales: const [
+        Locale('es', 'ES'), // Soporte para español
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       home: const ClaseLogin(),
     );
   }
