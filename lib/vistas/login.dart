@@ -1,6 +1,9 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:proyecto_grado_app/main.dart';
+import 'package:proyecto_grado_app/services/bloc/notificaciones_bloc.dart';
 import 'package:proyecto_grado_app/vistas/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,23 +20,24 @@ class _LoginState extends State<ClaseLogin>
   @override
   void initState() {
     super.initState();
+    context.read<NotificacionesBloc>().pedirPermisosUsuario();
     _CargarPreferencias();
   }
 
   _CargarPreferencias() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? idUsuarioGuardado = prefs.getString('ID');
-    final String? NombreUsuarioGuardado = prefs.getString('NOMBRES');
+    final String? nombreUsuarioGuardado = prefs.getString('NOMBRES');
     final String? tipoUsuarioGuardado = prefs.getString('CODIGOTIPOUSUARIO');
 
     if (idUsuarioGuardado != null &&
-        NombreUsuarioGuardado != null &&
+        nombreUsuarioGuardado != null &&
         tipoUsuarioGuardado != null) {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) => HomePage(idUsuarioGuardado,
-                  NombreUsuarioGuardado, tipoUsuarioGuardado)));
+                  nombreUsuarioGuardado, tipoUsuarioGuardado)));
     }
   }
 
@@ -42,17 +46,64 @@ class _LoginState extends State<ClaseLogin>
   TextEditingController controladorClave = TextEditingController();
   dynamic datosUsuario;
 
-  //funcion de consulta a base de datos
-  Future<bool> consultaUsuario(String documento, String clave) async {
-    //Dispositivo Fisico 192.168.1.6
-    final respuesta = await Dio()
-        .get('http://10.0.2.2:3000/usuario/' + documento + '/' + clave + '');
-    if (respuesta.data != '') {
-      datosUsuario = respuesta.data;
-      return true;
-    } else {
+//consultamos el usuario que quiere iniciar sesion
+  Future<bool> consultaUsuario(
+      BuildContext context, String documento, String clave) async {
+    try {
+      final dio = Dio();
+
+      // Configurar el tiempo límite (timeout) para la solicitud
+      dio.options.connectTimeout =
+          const Duration(seconds: 5); // 10 segundos de tiempo límite
+      dio.options.receiveTimeout =
+          const Duration(seconds: 5); // 10 segundos para recibir respuesta
+
+      // Realizar la solicitud HTTP
+      final respuesta =
+          await dio.get('http://10.0.2.2:3000/usuario/$documento/$clave');
+
+      if (respuesta.data != '') {
+        // Procesar los datos recibidos
+        datosUsuario = respuesta.data;
+        return true;
+      } else {
+        return false;
+      }
+    } on DioError catch (e) {
+      // Manejar el error si es un timeout o problemas de conexión
+      if (e.type == DioErrorType.connectionTimeout ||
+          e.type == DioErrorType.receiveTimeout) {
+        _mostrarMensajeError(context,
+            'Tiempo de espera agotado. Revisa tu conexión a internet e intenta más tarde.');
+      } else if (e.type == DioErrorType.connectionError) {
+        _mostrarMensajeError(context,
+            'No se ha podido obtener una respuesta válida del servidor. Revisa tu conexión a internet e intenta más tarde.');
+      } else {
+        _mostrarMensajeError(context, 'Ha ocurrido un error inesperado.');
+      }
       return false;
     }
+  }
+
+// Función para mostrar un mensaje de error en pantalla
+  void _mostrarMensajeError(BuildContext context, String mensaje) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(mensaje),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -161,7 +212,7 @@ class _LoginState extends State<ClaseLogin>
             //verificamos si encontro el usuario
             // ignore: unrelated_type_equality_checks
             if (!(await consultaUsuario(
-                controladorDocumento.text, controladorClave.text))) {
+                context, controladorDocumento.text, controladorClave.text))) {
               //Aviso al usuario
               final snackBar = SnackBar(
                 elevation: 0,

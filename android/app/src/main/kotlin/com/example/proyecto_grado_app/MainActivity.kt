@@ -1,4 +1,4 @@
-package com.example.proyecto_grado_app
+package com.udi.proyectogrado
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -399,7 +399,8 @@ class _UsuarioGestionState extends State<ClaseUsuarioGestion> {
                               backgroundColor: Colors.transparent,
                               content: AwesomeSnackbarContent(
                                 title: 'Información',
-                                message: 'Error al eliminar el usuario.',
+                                message:
+                                    'Error al eliminar el usuario. Es posible que existan estudiantes vinculados, observaciones o citaciones a dicho usuario.',
                                 contentType: ContentType.failure,
                               ),
                             );

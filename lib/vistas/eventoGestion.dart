@@ -59,10 +59,58 @@ class _ClaseEventoGestionState extends State<ClaseEventoGestion> {
     );
     // Verificamos si la respuesta fue exitosa (código 200)
     if (respuesta.statusCode == 200) {
-      print('Evento creado exitosamente: ${respuesta.data.toString()}');
+      if (await notificarUsuarios()) {
+        print('Evento creado exitosamente, Notificado correcto');
+      } else {
+        print('Evento creado exitosamente, Problemas en la notificacion');
+      }
       return true;
     } else {
       print('Error al crear evento: ${respuesta.data.toString()}');
+      return false;
+    }
+  }
+
+// Método para gestionar notificaciones
+  Future<bool> notificarUsuarios() async {
+    List<String> listaTokens = [];
+    // Realizar la petición al API
+    final respuesta =
+        await Dio().get('http://10.0.2.2:3000/usuario/ConsultaToken');
+
+    // Verificar si la respuesta fue exitosa
+    if (respuesta.statusCode == 200) {
+      // Recorrer la respuesta (lista de tokens)
+      for (var usuario in respuesta.data) {
+        // Almacenar cada TOKEN en el array de tokens
+        listaTokens.add(usuario['TOKEN']);
+      }
+      // Llamar a la función auxiliarNotificacion pasándole la lista de tokens
+      if (await auxiliarNotificacion(listaTokens)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  // Función auxiliar para enviar la lista de tokens
+  Future<bool> auxiliarNotificacion(List<String> tokens) async {
+    // Realizar la petición al API
+    final respuesta =
+        await Dio().post('http://10.0.2.2:3000/notification', data: {
+      "title": "Nuevo evento publicado",
+      "body": _nombreController.text,
+      "deviceId": tokens
+    });
+    // Verificar si la respuesta fue exitosa
+    if (respuesta.statusCode == 201) {
+      print('Notificaciones correctas');
+      return true;
+    } else {
+      print('Error al notificar: ${respuesta.data.toString()}');
       return false;
     }
   }

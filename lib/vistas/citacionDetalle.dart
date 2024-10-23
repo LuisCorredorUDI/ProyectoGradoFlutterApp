@@ -85,7 +85,7 @@ class _CitacionDetalleState extends State<ClaseCitacionDetalle> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Crear Citación"),
+        title: const Text("Citación"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

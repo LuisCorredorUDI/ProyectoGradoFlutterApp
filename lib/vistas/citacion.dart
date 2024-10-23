@@ -33,6 +33,8 @@ class _CitacionState extends State<ClaseCitacion> {
       traerCitacionesFull();
     } else if (widget.tipoUsuarioSesion == "2") {
       traerCitacionesFill();
+    } else if (widget.tipoUsuarioSesion == "3") {
+      traerCitacionesFillEstudiante();
     }
   }
 
@@ -69,10 +71,25 @@ class _CitacionState extends State<ClaseCitacion> {
     }
   }
 
-  // Función para la consulta de citaciones (filtrado por usuario)
+  // Función para la consulta de citaciones (filtrado por usuario acudiente)
   Future<void> traerCitacionesFill() async {
     final respuesta = await Dio().get(
         'http://10.0.2.2:3000/citacion/ListarCitacionesFill/${widget.idUsuarioSesion}');
+    if (respuesta.statusCode == 200) {
+      List<dynamic> data = respuesta.data;
+      setState(() {
+        citaciones = data
+            .map<ConversorCitacion>(
+                (elemento) => ConversorCitacion.fromJson(elemento))
+            .toList();
+      });
+    }
+  }
+
+  // Función para la consulta de citaciones (filtrado por usuario)
+  Future<void> traerCitacionesFillEstudiante() async {
+    final respuesta = await Dio().get(
+        'http://10.0.2.2:3000/citacion/ListarCitacionesFillEstudiante/${widget.idUsuarioSesion}');
     if (respuesta.statusCode == 200) {
       List<dynamic> data = respuesta.data;
       setState(() {

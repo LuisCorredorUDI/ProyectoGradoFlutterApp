@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert'; // Para convertir Base64
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:proyecto_grado_app/services/bloc/notificaciones_bloc.dart';
 import 'package:proyecto_grado_app/vistas/acudiente.dart';
 import 'package:proyecto_grado_app/vistas/evento.dart';
 import 'package:proyecto_grado_app/vistas/Conversores/conversorEventoHome.dart';
@@ -37,6 +39,9 @@ class _HomeState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    context.read<NotificacionesBloc>().pedirPermisosUsuario();
+    //actualizar el token del dispositivo para el usuario que este en sesion
+    actualizarToken();
     //buscamos el listado de eventos
     traerEventos();
     // Determinamos el tipo de perfil
@@ -58,8 +63,24 @@ class _HomeState extends State<HomePage> {
         _currentPage = 0;
       }
       _pageController.animateToPage(_currentPage,
-          duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
+          duration: const Duration(milliseconds: 700), curve: Curves.easeIn);
     });
+  }
+
+  Future<void> actualizarToken() async {
+    //buscamos en preferencias
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? tokenGuardado = prefs.getString('TOKEN');
+    if (tokenGuardado != '') {
+      final respuesta = await Dio().patch(
+          'http://10.0.2.2:3000/usuario/actualizarTokenUsuario/${widget.idUsuarioSesion}/$tokenGuardado');
+
+      if (respuesta.statusCode == 200) {
+        print('Se actualizo el token');
+      } else {
+        print('Error al actualizar el token');
+      }
+    }
   }
 
   Future<void> traerEventos() async {

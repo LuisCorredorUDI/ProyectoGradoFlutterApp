@@ -141,8 +141,7 @@ class _CitacionGestionState extends State<ClaseCitacionGestion> {
           await Dio().post('http://10.0.2.2:3000/citacion/Intermedia');
       // Verificamos si la respuesta fue exitosa (código 200)
       if (respuesta.statusCode == 200) {
-        print(
-            'Vinculacion CIT-OBS Creado exitosamente: ${respuesta.data.toString()}');
+        print('Crear CIT-OBS exitoso : ${respuesta.data.toString()}');
         return true;
       } else {
         print(
@@ -151,6 +150,52 @@ class _CitacionGestionState extends State<ClaseCitacionGestion> {
       }
     } catch (error) {
       print('Error al Crear Vinculacion CIT-OBS : ${error.toString()}');
+      return false;
+    }
+  }
+
+// Método para gestionar notificaciones
+  Future<bool> notificarUsuarios() async {
+    List<String> listaTokens = [];
+    // Realizar la petición al API
+    final respuesta = await Dio().get(
+        'http://10.0.2.2:3000/usuario/ConsultaTokenUsuario/${widget.idUsuarioConsulta}');
+
+    // Verificar si la respuesta fue exitosa
+    if (respuesta.statusCode == 200) {
+      // Recorrer la respuesta (lista de tokens)
+      for (var usuario in respuesta.data) {
+        // Almacenar cada TOKEN en el array de tokens
+        listaTokens.add(usuario['TOKEN']);
+      }
+      // Llamar a la función auxiliarNotificacion pasándole la lista de tokens
+      if (await auxiliarNotificacion(listaTokens)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  // Función auxiliar para enviar la lista de tokens
+  Future<bool> auxiliarNotificacion(List<String> tokens) async {
+    // Realizar la petición al API
+    final respuesta =
+        await Dio().post('http://10.0.2.2:3000/notification', data: {
+      "title": "Citación pendiente",
+      "body": "Ha sido citado para el día: " +
+          _formatearFechaHora(_fechaInicio) +
+          ".\nRevisar citaciones para más detalles.",
+      "deviceId": tokens
+    });
+    // Verificar si la respuesta fue exitosa
+    if (respuesta.statusCode == 201) {
+      print('Notificaciones correctas');
+      return true;
+    } else {
+      print('Error al notificar: ${respuesta.data.toString()}');
       return false;
     }
   }
@@ -257,6 +302,7 @@ class _CitacionGestionState extends State<ClaseCitacionGestion> {
                           if (await guardarCitacion()) {
                             //si se guarda correctamente la citacion, guardamos la tabla intermedia
                             if (await guardarCitacionObservador()) {
+                              notificarUsuarios();
                               final snackBar = SnackBar(
                                 elevation: 0,
                                 behavior: SnackBarBehavior.floating,
@@ -335,6 +381,7 @@ class _CitacionGestionState extends State<ClaseCitacionGestion> {
                           _fechaInicio != null &&
                           _fechaFin != null) {
                         if (await guardarCitacion()) {
+                          notificarUsuarios();
                           final snackBar = SnackBar(
                             elevation: 0,
                             behavior: SnackBarBehavior.floating,
