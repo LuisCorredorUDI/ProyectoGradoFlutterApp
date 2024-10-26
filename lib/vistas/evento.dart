@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_grado_app/vistas/eventoGestion.dart';
 import 'package:proyecto_grado_app/vistas/Conversores/conversorEventoCoordinador.dart';
+import 'package:proyecto_grado_app/globales.dart';
 
 class ClaseEvento extends StatefulWidget {
   //Variables
@@ -45,8 +46,8 @@ class _EventoState extends State<ClaseEvento> {
 
   // Función para la consulta de eventos
   Future<void> traerEventos() async {
-    final respuesta =
-        await Dio().get('http://10.0.2.2:3000/evento/listaCoordinador');
+    final respuesta = await Dio()
+        .get('${GlobalesClass.direccionApi}/evento/listaCoordinador');
 
     if (respuesta.statusCode == 200) {
       List<dynamic> data = respuesta.data;
@@ -84,7 +85,7 @@ class _EventoState extends State<ClaseEvento> {
                 // Intentar eliminar el evento llamando a la API
                 try {
                   final respuesta = await Dio().delete(
-                      'http://10.0.2.2:3000/evento/EliminarEvento/$codigo');
+                      '${GlobalesClass.direccionApi}/evento/EliminarEvento/$codigo');
 
                   // Si la respuesta es exitosa, retornamos true
                   if (respuesta.statusCode == 200) {

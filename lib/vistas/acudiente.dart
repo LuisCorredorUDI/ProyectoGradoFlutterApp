@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_grado_app/vistas/Conversores/conversorUsuario.dart';
 import 'package:proyecto_grado_app/vistas/citacionGestion.dart';
+import 'package:proyecto_grado_app/globales.dart';
 
 class ClaseAcudiente extends StatefulWidget {
   //Acudiente al que vamos a gestionar
@@ -58,8 +59,8 @@ class _AcudienteState extends State<ClaseAcudiente> {
 
   // Función para la consulta de estudiantes por vincular
   Future<void> traerEstudiantes() async {
-    final respuesta =
-        await Dio().get('http://10.0.2.2:3000/usuario/ListadoPorVincular');
+    final respuesta = await Dio()
+        .get('${GlobalesClass.direccionApi}/usuario/ListadoPorVincular/');
 
     if (respuesta.statusCode == 200) {
       List<dynamic> data = respuesta.data;
@@ -78,7 +79,7 @@ class _AcudienteState extends State<ClaseAcudiente> {
   // Función para la consulta de estudiantes vinculados
   Future<void> traerEstudiantesVinculados() async {
     final respuesta = await Dio().get(
-        'http://10.0.2.2:3000/usuario/ListadoVinculados/' +
+        '${GlobalesClass.direccionApi}/usuario/ListadoVinculados/Acudiente/' +
             widget.idUsuarioConsulta);
 
     if (respuesta.statusCode == 200) {
@@ -98,7 +99,7 @@ class _AcudienteState extends State<ClaseAcudiente> {
   Future<bool> vincularEstudiante(int idEstudiante) async {
     try {
       final respuesta = await Dio().post(
-          'http://10.0.2.2:3000/usuario/CrearAcudiente/${widget.idUsuarioConsulta}/${idEstudiante}');
+          '${GlobalesClass.direccionApi}/usuario/CrearAcudiente/${widget.idUsuarioConsulta}/${idEstudiante}');
       // Verificamos si la respuesta fue exitosa (código 200)
       if (respuesta.statusCode == 200) {
         print('Acudiente Creado exitosamente: ${respuesta.data.toString()}');
@@ -117,7 +118,7 @@ class _AcudienteState extends State<ClaseAcudiente> {
   Future<bool> desvincularEstudiante(int idEstudiante) async {
     try {
       final respuesta = await Dio().delete(
-          'http://10.0.2.2:3000/usuario/DesvincularAcudiente/${widget.idUsuarioConsulta}/${idEstudiante}');
+          '${GlobalesClass.direccionApi}/usuario/DesvincularAcudiente/${widget.idUsuarioConsulta}/${idEstudiante}');
       // Verificamos si la respuesta fue exitosa (código 200)
       if (respuesta.statusCode == 200) {
         print('Desvinculacion exitosamente: ${respuesta.data.toString()}');

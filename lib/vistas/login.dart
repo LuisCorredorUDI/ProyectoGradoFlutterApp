@@ -2,7 +2,7 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:proyecto_grado_app/main.dart';
+import 'package:proyecto_grado_app/globales.dart';
 import 'package:proyecto_grado_app/services/bloc/notificaciones_bloc.dart';
 import 'package:proyecto_grado_app/vistas/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,8 +59,8 @@ class _LoginState extends State<ClaseLogin>
           const Duration(seconds: 5); // 10 segundos para recibir respuesta
 
       // Realizar la solicitud HTTP
-      final respuesta =
-          await dio.get('http://10.0.2.2:3000/usuario/$documento/$clave');
+      final respuesta = await dio
+          .get('${GlobalesClass.direccionApi}/usuario/$documento/$clave');
 
       if (respuesta.data != '') {
         // Procesar los datos recibidos

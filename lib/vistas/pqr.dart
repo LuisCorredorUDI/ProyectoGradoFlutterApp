@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_grado_app/vistas/Conversores/conversorPqr.dart';
 import 'package:proyecto_grado_app/vistas/pqrGestion.dart';
 import 'package:proyecto_grado_app/vistas/pqrGestionDetalle.dart';
+import 'package:proyecto_grado_app/globales.dart';
 
 class ClasePQR extends StatefulWidget {
   final String idUsuarioSesion;
@@ -68,28 +69,29 @@ class _ClasePQRState extends State<ClasePQR> {
       if (filtro == 'Todas') {
         // Coordinador Todas
         if (tipoUsuarioSesion == '1') {
-          ruta = 'http://10.0.2.2:3000/pqr/PorCoordinadorTodas';
+          ruta = '${GlobalesClass.direccionApi}/pqr/PorCoordinadorTodas';
         } else // Est-Acu Todas
         {
-          ruta = 'http://10.0.2.2:3000/pqr/PorUsuarioTodas/$idUsuarioSesion';
+          ruta =
+              '${GlobalesClass.direccionApi}/pqr/PorUsuarioTodas/$idUsuarioSesion';
         }
       } else if (filtro == 'En revision') {
         // Coordinador Revision
         if (tipoUsuarioSesion == '1') {
-          ruta = 'http://10.0.2.2:3000/pqr/PorCoordinadorSinRevisar';
+          ruta = '${GlobalesClass.direccionApi}/pqr/PorCoordinadorSinRevisar';
         } else // Est-Acu Revision
         {
           ruta =
-              'http://10.0.2.2:3000/pqr/PorUsuarioSinRevisar/$idUsuarioSesion';
+              '${GlobalesClass.direccionApi}/pqr/PorUsuarioSinRevisar/$idUsuarioSesion';
         }
       } else if (filtro == 'Revisadas') {
         // Coordinador revisadas
         if (tipoUsuarioSesion == '1') {
-          ruta = 'http://10.0.2.2:3000/pqr/PorCoordinadorRevisadas';
+          ruta = '${GlobalesClass.direccionApi}/pqr/PorCoordinadorRevisadas';
         } else // Est-Acu revisadas
         {
           ruta =
-              'http://10.0.2.2:3000/pqr/PorUsuarioRevisadas/$idUsuarioSesion';
+              '${GlobalesClass.direccionApi}/pqr/PorUsuarioRevisadas/$idUsuarioSesion';
         }
       }
 

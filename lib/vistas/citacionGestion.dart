@@ -1,7 +1,7 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:proyecto_grado_app/globales.dart';
 
 class ClaseCitacionGestion extends StatefulWidget {
   final String idUsuarioConsulta;
@@ -91,7 +91,7 @@ class _CitacionGestionState extends State<ClaseCitacionGestion> {
   Future<bool> guardarCitacion() async {
     try {
       final respuesta = await Dio()
-          .post('http://10.0.2.2:3000/citacion/CrearCitacion', data: {
+          .post('${GlobalesClass.direccionApi}/citacion/CrearCitacion', data: {
         "DETALLE": _detalleController.text,
         "FECHAINICIO": _formatearFechaHora(_fechaInicio),
         "FECHAFIN": _formatearFechaHora(_fechaFin),
@@ -114,12 +114,13 @@ class _CitacionGestionState extends State<ClaseCitacionGestion> {
   //funcion para guardar un registro de observador
   Future<bool> guardarObservador() async {
     try {
-      final respuesta = await Dio()
-          .post('http://10.0.2.2:3000/observador/CrearObservador', data: {
-        "TITULO": _tituloController.text,
-        "DETALLE": _detalleDisciplinarioController.text,
-        "USUARIOOBSERVACION": widget.idEstudiante
-      });
+      final respuesta = await Dio().post(
+          '${GlobalesClass.direccionApi}/observador/CrearObservador',
+          data: {
+            "TITULO": _tituloController.text,
+            "DETALLE": _detalleDisciplinarioController.text,
+            "USUARIOOBSERVACION": widget.idEstudiante
+          });
       // Verificamos si la respuesta fue exitosa (código 200)
       if (respuesta.statusCode == 200) {
         print('Exito al guardar observador: ${respuesta.data.toString()}');
@@ -138,7 +139,7 @@ class _CitacionGestionState extends State<ClaseCitacionGestion> {
   Future<bool> guardarCitacionObservador() async {
     try {
       final respuesta =
-          await Dio().post('http://10.0.2.2:3000/citacion/Intermedia');
+          await Dio().post('${GlobalesClass.direccionApi}/citacion/Intermedia');
       // Verificamos si la respuesta fue exitosa (código 200)
       if (respuesta.statusCode == 200) {
         print('Crear CIT-OBS exitoso : ${respuesta.data.toString()}');
@@ -159,20 +160,26 @@ class _CitacionGestionState extends State<ClaseCitacionGestion> {
     List<String> listaTokens = [];
     // Realizar la petición al API
     final respuesta = await Dio().get(
-        'http://10.0.2.2:3000/usuario/ConsultaTokenUsuario/${widget.idUsuarioConsulta}');
+        '${GlobalesClass.direccionApi}/usuario/ConsultaToken/Usuario/${widget.idUsuarioConsulta}');
 
     // Verificar si la respuesta fue exitosa
     if (respuesta.statusCode == 200) {
       // Recorrer la respuesta (lista de tokens)
       for (var usuario in respuesta.data) {
         // Almacenar cada TOKEN en el array de tokens
-        listaTokens.add(usuario['TOKEN']);
+        if (usuario['TOKEN'] != null) {
+          listaTokens.add(usuario['TOKEN']);
+        }
       }
       // Llamar a la función auxiliarNotificacion pasándole la lista de tokens
-      if (await auxiliarNotificacion(listaTokens)) {
-        return true;
+      if (listaTokens.isNotEmpty) {
+        if (await auxiliarNotificacion(listaTokens)) {
+          return true;
+        } else {
+          return false;
+        }
       } else {
-        return false;
+        return true;
       }
     } else {
       return false;
@@ -183,7 +190,7 @@ class _CitacionGestionState extends State<ClaseCitacionGestion> {
   Future<bool> auxiliarNotificacion(List<String> tokens) async {
     // Realizar la petición al API
     final respuesta =
-        await Dio().post('http://10.0.2.2:3000/notification', data: {
+        await Dio().post('${GlobalesClass.direccionApi}/notification', data: {
       "title": "Citación pendiente",
       "body": "Ha sido citado para el día: " +
           _formatearFechaHora(_fechaInicio) +

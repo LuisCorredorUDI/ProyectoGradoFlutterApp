@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:convert'; // Para la conversión de imagen a base64
+import 'package:proyecto_grado_app/globales.dart';
 
 class ClaseEventoGestion extends StatefulWidget {
   final String idUsuarioSesion;
@@ -47,7 +48,7 @@ class _ClaseEventoGestionState extends State<ClaseEventoGestion> {
 
     // Realizar la petición al API
     final respuesta = await Dio().post(
-      'http://10.0.2.2:3000/evento/CrearEvento',
+      '${GlobalesClass.direccionApi}/evento/CrearEvento',
       data: {
         "NOMBRE": _nombreController.text,
         "DETALLE": _detalleController.text,
@@ -76,7 +77,7 @@ class _ClaseEventoGestionState extends State<ClaseEventoGestion> {
     List<String> listaTokens = [];
     // Realizar la petición al API
     final respuesta =
-        await Dio().get('http://10.0.2.2:3000/usuario/ConsultaToken');
+        await Dio().get('${GlobalesClass.direccionApi}/usuario/ConsultaToken');
 
     // Verificar si la respuesta fue exitosa
     if (respuesta.statusCode == 200) {
@@ -100,7 +101,7 @@ class _ClaseEventoGestionState extends State<ClaseEventoGestion> {
   Future<bool> auxiliarNotificacion(List<String> tokens) async {
     // Realizar la petición al API
     final respuesta =
-        await Dio().post('http://10.0.2.2:3000/notification', data: {
+        await Dio().post('${GlobalesClass.direccionApi}/notification', data: {
       "title": "Nuevo evento publicado",
       "body": _nombreController.text,
       "deviceId": tokens

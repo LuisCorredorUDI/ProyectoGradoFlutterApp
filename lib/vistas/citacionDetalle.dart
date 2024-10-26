@@ -1,7 +1,6 @@
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:proyecto_grado_app/globales.dart';
 
 class ClaseCitacionDetalle extends StatefulWidget {
   final int idCitacion;
@@ -38,7 +37,7 @@ class _CitacionDetalleState extends State<ClaseCitacionDetalle> {
   Future<void> cargarDatosIniciales() async {
     if (widget.observaciones > 0) {
       final respuesta = await Dio().get(
-          'http://10.0.2.2:3000/citacion/DetalleCitacionObservacion/${widget.idCitacion}');
+          '${GlobalesClass.direccionApi}/citacion/DetalleCitacionObservacion/${widget.idCitacion}');
       if (respuesta.statusCode == 200) {
         // Como la respuesta es una lista, accedemos al primer elemento de la lista
         final data =
@@ -57,7 +56,7 @@ class _CitacionDetalleState extends State<ClaseCitacionDetalle> {
       }
     } else {
       final respuesta = await Dio().get(
-          'http://10.0.2.2:3000/citacion/DetalleCitacion/${widget.idCitacion}');
+          '${GlobalesClass.direccionApi}/citacion/DetalleCitacion/${widget.idCitacion}');
       if (respuesta.statusCode == 200) {
         // En este caso también accedemos al primer elemento de la lista
         final data =

@@ -12,6 +12,7 @@ import 'package:proyecto_grado_app/vistas/login.dart';
 import 'package:proyecto_grado_app/vistas/pqr.dart';
 import 'package:proyecto_grado_app/vistas/usuarios.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:proyecto_grado_app/globales.dart';
 
 class HomePage extends StatefulWidget {
   final String idUsuarioSesion;
@@ -73,7 +74,7 @@ class _HomeState extends State<HomePage> {
     final String? tokenGuardado = prefs.getString('TOKEN');
     if (tokenGuardado != '') {
       final respuesta = await Dio().patch(
-          'http://10.0.2.2:3000/usuario/actualizarTokenUsuario/${widget.idUsuarioSesion}/$tokenGuardado');
+          '${GlobalesClass.direccionApi}/usuario/actualizarTokenUsuario/${widget.idUsuarioSesion}/$tokenGuardado');
 
       if (respuesta.statusCode == 200) {
         print('Se actualizo el token');
@@ -88,7 +89,8 @@ class _HomeState extends State<HomePage> {
       cargando = true; // Inicia la carga
     });
 
-    final respuesta = await Dio().get('http://10.0.2.2:3000/evento/listaHome');
+    final respuesta =
+        await Dio().get('${GlobalesClass.direccionApi}/evento/listaHome');
 
     if (respuesta.statusCode == 200) {
       List<dynamic> data = respuesta.data;
@@ -270,18 +272,20 @@ class _HomeState extends State<HomePage> {
               },
             ),
             // Opción de menú: PQR
-            _menuItem(
-              title: 'PQR',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ClasePQR(widget.idUsuarioSesion,
-                        widget.nombreUsuarioSesion, widget.tipoUsuarioSesion),
-                  ),
-                );
-              },
-            ),
+            if (widget.tipoUsuarioSesion == '1' ||
+                widget.tipoUsuarioSesion == '2')
+              _menuItem(
+                title: 'PQR',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ClasePQR(widget.idUsuarioSesion,
+                          widget.nombreUsuarioSesion, widget.tipoUsuarioSesion),
+                    ),
+                  );
+                },
+              ),
             // Condicional para mostrar la opción de "Usuarios" solo para Coordinador (tipoUsuarioSesion == '1')
             if (widget.tipoUsuarioSesion == '1')
               _menuItem(

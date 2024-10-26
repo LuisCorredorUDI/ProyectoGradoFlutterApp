@@ -1,6 +1,7 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:proyecto_grado_app/globales.dart';
 
 class ClasepqrGestionDetalle extends StatefulWidget {
   final String tipoUsuarioSesion;
@@ -34,7 +35,7 @@ class _ClasepqrGestionDetalleState extends State<ClasepqrGestionDetalle> {
       int codigoPqrConsulta, int referenciaPqrConsulta) async {
     try {
       final respuesta = await Dio().get(
-        'http://10.0.2.2:3000/pqr/DetallePqr/$codigoPqrConsulta/$referenciaPqrConsulta',
+        '${GlobalesClass.direccionApi}/pqr/DetallePqr/$codigoPqrConsulta/$referenciaPqrConsulta',
       );
 
       if (respuesta.statusCode == 200) {
@@ -56,7 +57,7 @@ class _ClasepqrGestionDetalleState extends State<ClasepqrGestionDetalle> {
     try {
       print(respuesta);
       await Dio().patch(
-        'http://10.0.2.2:3000/pqr/ActualizarRespuesta/${widget.codigoPqrConsulta}/${widget.referenciaPqrConsulta}',
+        '${GlobalesClass.direccionApi}/pqr/ActualizarRespuesta/${widget.codigoPqrConsulta}/${widget.referenciaPqrConsulta}',
         data: {"RESPUESTA": respuesta},
       );
       _mostrarMensajeExito('Respuesta actualizada con éxito.');
@@ -70,7 +71,7 @@ class _ClasepqrGestionDetalleState extends State<ClasepqrGestionDetalle> {
   Future<void> cancelarPqr() async {
     try {
       await Dio().patch(
-        'http://10.0.2.2:3000/pqr/CancelarPqr/${widget.codigoPqrConsulta}/${widget.referenciaPqrConsulta}',
+        '${GlobalesClass.direccionApi}/pqr/CancelarPqr/${widget.codigoPqrConsulta}/${widget.referenciaPqrConsulta}',
       );
       _mostrarMensajeExito('PQR cancelada con éxito.');
       Navigator.pop(context);

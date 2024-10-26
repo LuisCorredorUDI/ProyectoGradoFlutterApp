@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_grado_app/vistas/Conversores/conversorUsuario.dart';
 import 'package:proyecto_grado_app/vistas/usuariosGestion.dart';
+import 'package:proyecto_grado_app/globales.dart';
 
 class ClaseUsuario extends StatefulWidget {
   final String idUsuarioSesion;
@@ -72,7 +73,7 @@ class _UsuarioState extends State<ClaseUsuario> {
 
   // Función para la consulta de usuarios
   Future<void> traerUsuarios() async {
-    final respuesta = await Dio().get('http://10.0.2.2:3000/usuario');
+    final respuesta = await Dio().get('${GlobalesClass.direccionApi}/usuario');
 
     if (respuesta.statusCode == 200) {
       List<dynamic> data = respuesta.data;

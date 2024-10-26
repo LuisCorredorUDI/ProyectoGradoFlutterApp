@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:proyecto_grado_app/vistas/acudiente.dart';
+import 'package:proyecto_grado_app/globales.dart';
 
 class ClaseUsuarioGestion extends StatefulWidget {
   //Variables globales
@@ -60,49 +61,50 @@ class _UsuarioGestionState extends State<ClaseUsuarioGestion> {
 
   //FUNCION DE CARGUE DE DATOS, EN CASO DE CONSULTA O EDICION.
   Future<void> cargarDatosIniciales(String idUsuarioConsulta) async {
-    final respuesta = await Dio().get(
-        'http://10.0.2.2:3000/usuario/DetalleUsuario/' + idUsuarioConsulta);
+    final respuestaServ = await Dio().get(
+        '${GlobalesClass.direccionApi}/usuario/DetalleUsuarioCoor/usuariodetalle/' +
+            idUsuarioConsulta);
     //Variables para fechas
     DateTime parsedDate;
     String formattedDate;
-    if (respuesta.statusCode == 200) {
+    if (respuestaServ.statusCode == 200) {
       setState(() {
+        final respuesta = respuestaServ.data[0];
         // Asegurarse de que el cambio se refleje en la UI
-        nombresController.text = respuesta.data['NOMBRES'].toString();
-        apellidosController.text = respuesta.data['APELLIDOS'].toString();
-        documentoController.text = respuesta.data['DOCUMENTO'].toString();
-        claveIngresoController.text = respuesta.data['CLAVEINGRESO'].toString();
-        parsedDate =
-            DateTime.parse(respuesta.data['FECHANACIMIENTO'].toString());
+        nombresController.text = respuesta['NOMBRES'].toString();
+        apellidosController.text = respuesta['APELLIDOS'].toString();
+        documentoController.text = respuesta['DOCUMENTO'].toString();
+        claveIngresoController.text = respuesta['CLAVEINGRESO'].toString();
+        parsedDate = DateTime.parse(respuesta['FECHANACIMIENTO'].toString());
         formattedDate = DateFormat('yyyy-MM-dd').format(parsedDate);
         fechaNacimientoController.text = formattedDate;
 
-        if (respuesta.data['NUMEROTELEFONO'] != null) {
+        if (respuesta['NUMEROTELEFONO'] != null) {
           numeroTelefonoController.text =
-              respuesta.data['NUMEROTELEFONO'].toString();
+              respuesta['NUMEROTELEFONO'].toString();
         }
-        numeroMovilController.text = respuesta.data['NUMEROMOVIL'].toString();
+        numeroMovilController.text = respuesta['NUMEROMOVIL'].toString();
 
-        if (respuesta.data['CORREO'] != null) {
-          correoController.text = respuesta.data['CORREO'].toString();
+        if (respuesta['CORREO'] != null) {
+          correoController.text = respuesta['CORREO'].toString();
         }
-        if (respuesta.data['DIRECCION'] != null) {
-          direccionController.text = respuesta.data['DIRECCION'].toString();
+        if (respuesta['DIRECCION'] != null) {
+          direccionController.text = respuesta['DIRECCION'].toString();
         }
 
         //combo estado
-        if (respuesta.data['ESTADO'] == 1) {
+        if (respuesta['ESTADO'] == 1) {
           estadoSeleccionado = 'Activo';
-        } else if (respuesta.data['ESTADO'] == 0) {
+        } else if (respuesta['ESTADO'] == 0) {
           estadoSeleccionado = 'Inactivo';
         }
 
         //combo tipo
-        if (respuesta.data['CODIGOTIPOUSUARIO'] == 1) {
+        if (respuesta['CODIGOTIPOUSUARIO'] == 1) {
           tipoUsuarioSeleccionado = 'Coordinador';
-        } else if (respuesta.data['CODIGOTIPOUSUARIO'] == 2) {
+        } else if (respuesta['CODIGOTIPOUSUARIO'] == 2) {
           tipoUsuarioSeleccionado = 'Acudiente';
-        } else if (respuesta.data['CODIGOTIPOUSUARIO'] == 3) {
+        } else if (respuesta['CODIGOTIPOUSUARIO'] == 3) {
           tipoUsuarioSeleccionado = 'Estudiante';
         }
       });
@@ -140,7 +142,7 @@ class _UsuarioGestionState extends State<ClaseUsuarioGestion> {
       final respuesta;
       if (widget.modo == 0) {
         respuesta = await Dio().post(
-          'http://10.0.2.2:3000/usuario/CrearUsuario',
+          '${GlobalesClass.direccionApi}/usuario/CrearUsuario',
           data: {
             "NOMBRES": nombresController.text,
             "APELLIDOS": apellidosController.text,
@@ -165,7 +167,7 @@ class _UsuarioGestionState extends State<ClaseUsuarioGestion> {
         }
       } else if (widget.modo == 1) {
         respuesta = await Dio().patch(
-          'http://10.0.2.2:3000/usuario/ActualizarUsuario/${widget.idUsuarioConsulta}',
+          '${GlobalesClass.direccionApi}/usuario/ActualizarUsuario/${widget.idUsuarioConsulta}',
           data: {
             "NOMBRES": nombresController.text,
             "APELLIDOS": apellidosController.text,
@@ -208,7 +210,7 @@ class _UsuarioGestionState extends State<ClaseUsuarioGestion> {
 
   Future<bool> eliminarUsuario() async {
     final respuesta = await Dio().delete(
-        'http://10.0.2.2:3000/usuario/EliminarUsuario/' +
+        '${GlobalesClass.direccionApi}/usuario/EliminarUsuario/' +
             widget.idUsuarioConsulta);
     // Verificamos si la respuesta fue exitosa (código 200)
     if (respuesta.statusCode == 200) {

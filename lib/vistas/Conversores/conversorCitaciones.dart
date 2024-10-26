@@ -18,7 +18,7 @@ class ConversorCitacion {
   final DateTime fechafin;
   final int usuariocitacion;
   final String nombrecitado;
-  final int citacionesnum;
+  final String citacionesnum;
 
   ConversorCitacion({
     required this.codigo,

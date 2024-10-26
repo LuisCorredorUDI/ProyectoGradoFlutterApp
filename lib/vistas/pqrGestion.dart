@@ -2,6 +2,7 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:proyecto_grado_app/vistas/Conversores/conversorDerecho.dart';
+import 'package:proyecto_grado_app/globales.dart';
 
 class ClasePqrGestion extends StatefulWidget {
   final String idUsuarioSesion;
@@ -42,8 +43,8 @@ class _PqrGestionState extends State<ClasePqrGestion> {
 
   Future<void> traerderechos() async {
     try {
-      final respuesta = await Dio()
-          .get('http://10.0.2.2:3000/derecho/' + widget.tipoUsuarioSesion);
+      final respuesta = await Dio().get(
+          '${GlobalesClass.direccionApi}/derecho/' + widget.tipoUsuarioSesion);
 
       if (respuesta.statusCode == 200) {
         List<dynamic> data = respuesta.data;
@@ -82,7 +83,7 @@ class _PqrGestionState extends State<ClasePqrGestion> {
     _derechoSeleccionado ??= 'NULL';
 
     final respuesta = await Dio().post(
-      'http://10.0.2.2:3000/pqr/CrearPqr',
+      '${GlobalesClass.direccionApi}/pqr/CrearPqr',
       data: {
         "DETALLE": _detallePqrController.text,
         "TIPOPQR": tipoPqr,

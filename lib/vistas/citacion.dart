@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:proyecto_grado_app/vistas/Conversores/conversorCitaciones.dart';
 import 'package:intl/intl.dart';
 import 'package:proyecto_grado_app/vistas/citacionDetalle.dart'; // Paquete para formatear fechas
+import 'package:proyecto_grado_app/globales.dart';
 
 class ClaseCitacion extends StatefulWidget {
   //Variables
@@ -58,8 +59,8 @@ class _CitacionState extends State<ClaseCitacion> {
 
   // Función para la consulta de citaciones (todos los usuarios)
   Future<void> traerCitacionesFull() async {
-    final respuesta =
-        await Dio().get('http://10.0.2.2:3000/citacion/ListarCitaciones');
+    final respuesta = await Dio()
+        .get('${GlobalesClass.direccionApi}/citacion/ListarCitaciones');
     if (respuesta.statusCode == 200) {
       List<dynamic> data = respuesta.data;
       setState(() {
@@ -74,7 +75,7 @@ class _CitacionState extends State<ClaseCitacion> {
   // Función para la consulta de citaciones (filtrado por usuario acudiente)
   Future<void> traerCitacionesFill() async {
     final respuesta = await Dio().get(
-        'http://10.0.2.2:3000/citacion/ListarCitacionesFill/${widget.idUsuarioSesion}');
+        '${GlobalesClass.direccionApi}/citacion/ListarCitacionesFill/${widget.idUsuarioSesion}');
     if (respuesta.statusCode == 200) {
       List<dynamic> data = respuesta.data;
       setState(() {
@@ -89,7 +90,7 @@ class _CitacionState extends State<ClaseCitacion> {
   // Función para la consulta de citaciones (filtrado por usuario)
   Future<void> traerCitacionesFillEstudiante() async {
     final respuesta = await Dio().get(
-        'http://10.0.2.2:3000/citacion/ListarCitacionesFillEstudiante/${widget.idUsuarioSesion}');
+        '${GlobalesClass.direccionApi}/citacion/ListarCitacionesFillEstudiante/${widget.idUsuarioSesion}');
     if (respuesta.statusCode == 200) {
       List<dynamic> data = respuesta.data;
       setState(() {
@@ -103,7 +104,7 @@ class _CitacionState extends State<ClaseCitacion> {
 
   // Función para borrar una citacion con confirmación
   Future<bool> confirmarYBorrarCitacion(
-      BuildContext context, int codigo) async {
+      BuildContext context, int codigo, int observaciones) async {
     bool eliminado = false;
 
     // Mostrar el diálogo de confirmación
@@ -125,22 +126,44 @@ class _CitacionState extends State<ClaseCitacion> {
             TextButton(
               onPressed: () async {
                 // Intentar eliminar el evento llamando a la API
-                try {
-                  final respuesta = await Dio().delete(
-                      'http://10.0.2.2:3000/citacion/EliminarCitacion/$codigo');
+                if (observaciones > 0) {
+                  try {
+                    final respuesta = await Dio().delete(
+                        '${GlobalesClass.direccionApi}/citacion/EliminarCitacion/$codigo');
 
-                  // Si la respuesta es exitosa, retornamos true
-                  if (respuesta.statusCode == 200) {
-                    print('Citacion eliminado exitosamente: ${respuesta.data}');
-                    eliminado = true;
-                  } else {
-                    print('Error al eliminar Citacion: ${respuesta.data}');
+                    // Si la respuesta es exitosa, retornamos true
+                    if (respuesta.statusCode == 200) {
+                      print(
+                          'Citacion eliminado exitosamente: ${respuesta.data}');
+                      eliminado = true;
+                    } else {
+                      print('Error al eliminar Citacion: ${respuesta.data}');
+                      eliminado = false;
+                    }
+                  } catch (e) {
+                    // Manejo de excepciones y errores
+                    print('Error durante la eliminación: $e');
                     eliminado = false;
                   }
-                } catch (e) {
-                  // Manejo de excepciones y errores
-                  print('Error durante la eliminación: $e');
-                  eliminado = false;
+                } else {
+                  try {
+                    final respuesta = await Dio().delete(
+                        '${GlobalesClass.direccionApi}/citacion/eliminarCitacionSinObs/$codigo');
+
+                    // Si la respuesta es exitosa, retornamos true
+                    if (respuesta.statusCode == 200) {
+                      print(
+                          'Citacion eliminado exitosamente: ${respuesta.data}');
+                      eliminado = true;
+                    } else {
+                      print('Error al eliminar Citacion: ${respuesta.data}');
+                      eliminado = false;
+                    }
+                  } catch (e) {
+                    // Manejo de excepciones y errores
+                    print('Error durante la eliminación: $e');
+                    eliminado = false;
+                  }
                 }
                 Navigator.of(context).pop(); // Cerrar el diálogo
               },
@@ -177,8 +200,8 @@ class _CitacionState extends State<ClaseCitacion> {
                   child: InkWell(
                     // InkWell permite capturar el evento onTap
                     onTap: () {
-                      NavigateAndRefresh(
-                          context, citacion.codigo, citacion.citacionesnum);
+                      NavigateAndRefresh(context, citacion.codigo,
+                          int.parse(citacion.citacionesnum));
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -257,7 +280,9 @@ class _CitacionState extends State<ClaseCitacion> {
                                   onPressed: () async {
                                     bool respuesta =
                                         await confirmarYBorrarCitacion(
-                                            context, citacion.codigo);
+                                            context,
+                                            citacion.codigo,
+                                            int.parse(citacion.citacionesnum));
                                     if (respuesta) {
                                       // Aviso al usuario
                                       final snackBar = SnackBar(
