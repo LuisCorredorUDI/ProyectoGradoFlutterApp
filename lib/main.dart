@@ -21,7 +21,7 @@ void main() async {
     providers: [
       BlocProvider(create: (context) => NotificacionesBloc()),
     ],
-    child: MainApp(),
+    child: const MainApp(),
   ));
 }
 
@@ -49,4 +49,5 @@ class MainApp extends StatelessWidget {
     );
   }
 }
+//para generar apk : flutter build apk --split-per-abi
 //Vista principal fin

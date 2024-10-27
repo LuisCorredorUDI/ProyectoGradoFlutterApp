@@ -132,15 +132,20 @@ class _UsuarioState extends State<ClaseUsuario> {
           margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
           child: ListTile(
             title: Text(
-              item_usuario.nombres + ' ' + item_usuario.apellidos,
+              '${item_usuario.nombres} ${item_usuario.apellidos}',
               style: const TextStyle(color: Colors.blue), // Título en azul
             ),
             subtitle: Text(item_usuario.documento.toString()),
             leading: CircleAvatar(
-              backgroundColor: Colors.blue[300], // Fondo azul
-              child: Text(
-                item_usuario.id.toString(),
-                style: const TextStyle(color: Colors.black), // Texto negro
+              backgroundColor: item_usuario.codigotipousuario == 2
+                  ? Colors.red[300] // Fondo rojo si codigotipousuario es 2
+                  : item_usuario.codigotipousuario == 1
+                      ? Colors
+                          .green[300] // Fondo verde si codigotipousuario es 1
+                      : Colors.blue[300], // Fondo azul en otros casos
+              child: const Icon(
+                Icons.edit, // Icono de editar
+                color: Colors.black, // Color del icono
               ),
             ),
             onTap: () {

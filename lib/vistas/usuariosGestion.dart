@@ -364,7 +364,7 @@ class _UsuarioGestionState extends State<ClaseUsuarioGestion> {
                           backgroundColor: Colors.greenAccent[200],
                         ),
                         child: const Text(
-                          'Guardar Usuario',
+                          'Guardar',
                           style: TextStyle(color: Colors.black),
                         ),
                       ),
@@ -417,7 +417,7 @@ class _UsuarioGestionState extends State<ClaseUsuarioGestion> {
                           backgroundColor: Colors.red[200],
                         ),
                         child: const Text(
-                          'Eliminar Usuario',
+                          'Eliminar',
                           style: TextStyle(color: Colors.black),
                         ),
                       ),
