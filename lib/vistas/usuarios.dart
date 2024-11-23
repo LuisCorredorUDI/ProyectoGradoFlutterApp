@@ -144,7 +144,7 @@ class _UsuarioState extends State<ClaseUsuario> {
                           .green[300] // Fondo verde si codigotipousuario es 1
                       : Colors.blue[300], // Fondo azul en otros casos
               child: const Icon(
-                Icons.edit, // Icono de editar
+                Icons.person, // Icono de editar
                 color: Colors.black, // Color del icono
               ),
             ),

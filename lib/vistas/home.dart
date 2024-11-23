@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:proyecto_grado_app/services/bloc/notificaciones_bloc.dart';
 import 'package:proyecto_grado_app/vistas/acudiente.dart';
+import 'package:proyecto_grado_app/vistas/deber.dart';
+import 'package:proyecto_grado_app/vistas/derecho.dart';
 import 'package:proyecto_grado_app/vistas/evento.dart';
 import 'package:proyecto_grado_app/vistas/Conversores/conversorEventoHome.dart';
 import 'package:proyecto_grado_app/vistas/citacion.dart';
@@ -309,6 +311,34 @@ class _HomeState extends State<HomePage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => ClaseEvento(widget.idUsuarioSesion,
+                          widget.nombreUsuarioSesion, widget.tipoUsuarioSesion),
+                    ),
+                  );
+                },
+              ),
+            // Condicional para mostrar la opción de "Derechos" solo para Coordinador (tipoUsuarioSesion == '1')
+            if (widget.tipoUsuarioSesion == '1')
+              _menuItem(
+                title: 'Derecho',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ClaseDerecho(widget.idUsuarioSesion,
+                          widget.nombreUsuarioSesion, widget.tipoUsuarioSesion),
+                    ),
+                  );
+                },
+              ),
+            // Condicional para mostrar la opción de "Deberes" solo para Coordinador (tipoUsuarioSesion == '1')
+            if (widget.tipoUsuarioSesion == '1')
+              _menuItem(
+                title: 'Deber',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ClaseDeber(widget.idUsuarioSesion,
                           widget.nombreUsuarioSesion, widget.tipoUsuarioSesion),
                     ),
                   );

@@ -144,7 +144,12 @@ class _ClasepqrGestionDetalleState extends State<ClasepqrGestionDetalle> {
                 _formatDate(detallePqr?['FECHARESPUESTA'])),
 
             // Apartado 8: Botón de acción (Guardar o Cancelar PQR)
-            if (detallePqr?['ESTADOPQR'] == 2)
+            if (detallePqr?['ESTADOPQR'] == 1)
+              const Text(
+                'Sin acciones, se ha generado una respuesta para la PQR.',
+                style: TextStyle(color: Colors.red),
+              )
+            else if (detallePqr?['ESTADOPQR'] == 2)
               const Text(
                 'Sin acciones, la PQR se encuentra cancelada.',
                 style: TextStyle(color: Colors.red),

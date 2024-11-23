@@ -2,6 +2,7 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_grado_app/globales.dart';
+import 'package:proyecto_grado_app/vistas/Conversores/conversorDeber.dart';
 
 class ClaseCitacionGestion extends StatefulWidget {
   final String idUsuarioConsulta;
@@ -17,6 +18,9 @@ class ClaseCitacionGestion extends StatefulWidget {
 }
 
 class _CitacionGestionState extends State<ClaseCitacionGestion> {
+  //variables
+  List<ConversorDeber> listaDeberes = [];
+  String? _deberSeleccionado;
   final TextEditingController _detalleController = TextEditingController();
   DateTime? _fechaInicio;
   DateTime? _fechaFin;
@@ -85,6 +89,38 @@ class _CitacionGestionState extends State<ClaseCitacionGestion> {
   String _formatearFechaHora(DateTime? fecha) {
     if (fecha == null) return '';
     return '${fecha.year}/${fecha.month.toString().padLeft(2, '0')}/${fecha.day.toString().padLeft(2, '0')} ${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}';
+  }
+
+  //metodo por defecto de inicio
+  @override
+  void initState() {
+    super.initState();
+    traerdeberes();
+  }
+
+  //este procedimiento es para realizar el cargue de los deberes
+  Future<void> traerdeberes() async {
+    try {
+      final respuesta = await Dio()
+          .get('${GlobalesClass.direccionApi}/deber/lista/DeberEstudiantes');
+
+      if (respuesta.statusCode == 200) {
+        List<dynamic> data = respuesta.data;
+        List<Map<String, dynamic>> dataList =
+            List<Map<String, dynamic>>.from(data);
+
+        setState(() {
+          listaDeberes = dataList
+              .map((elemento) => ConversorDeber.fromJson(elemento))
+              .toList();
+          if (listaDeberes.isNotEmpty) {
+            _deberSeleccionado = listaDeberes.first.detalle;
+          }
+        });
+      }
+    } catch (e) {
+      print('Error al cargar derechos: $e');
+    }
   }
 
   //funcion para guardar una citacion
@@ -256,6 +292,72 @@ class _CitacionGestionState extends State<ClaseCitacionGestion> {
                 },
               ),
               if (_esCitaDisciplinaria) ...[
+                DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(
+                    labelText: 'Deber Incumplido*',
+                    border: OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color:
+                            Colors.blue, // Borde en azul cuando está habilitado
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color:
+                            Colors.blue, // Borde en azul cuando está enfocado
+                      ),
+                    ),
+                  ),
+                  value: _deberSeleccionado,
+                  items: listaDeberes.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    ConversorDeber deber = entry.value;
+                    // Alterna colores de fondo basado en el índice
+                    Color backgroundColor =
+                        index.isEven ? Colors.grey[100]! : Colors.grey[300]!;
+
+                    return DropdownMenuItem<String>(
+                      value: deber
+                          .detalle, // Cambié a 'deber.detalle' en lugar de 'deber.codigo.toString()'
+                      child: Container(
+                        color:
+                            backgroundColor, // Alterna entre gris claro y oscuro
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5), // Espaciado interno
+                        child: Row(
+                          children: [
+                            const Icon(Icons.chevron_right, color: Colors.blue),
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Text(
+                                deber.detalle,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 15,
+                                style: const TextStyle(
+                                    color: Colors.black), // Texto en negro
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _deberSeleccionado =
+                          newValue; // 'newValue' ahora será igual a 'deber.detalle'
+                      _detalleDisciplinarioController.text = newValue ?? '';
+                      _tituloController.text = 'Observación Disciplinaria';
+                      print(_deberSeleccionado);
+                    });
+                  },
+                  style: const TextStyle(color: Colors.blue), // Texto en azul
+                  dropdownColor:
+                      Colors.white, // Color del fondo del desplegable
+                  isExpanded: true,
+                ),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _tituloController,
                   maxLength: 100,
